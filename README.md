@@ -2,7 +2,7 @@
 
 **AI Systems Architect | Cross-Domain Engineering**
 
-Architecture overviews and project statistics for technical review. No source code. All projects built January–March 2026 while working full-time as a salon manager and colorist.
+Architecture overviews and project statistics for technical review. No source code. All projects started January 2026 and actively ongoing — built while working full-time as a salon manager and colorist on a 2021 MacBook Air M1, bursting to AWS/GCP for heavy compute.
 
 Full project access available upon request — contact Dig.Russell.Licht@Gmail.com
 
@@ -12,8 +12,9 @@ Full project access available upon request — contact Dig.Russell.Licht@Gmail.c
 
 | Metric | Value |
 |--------|-------|
-| Total Python | 1,040,000+ lines across 7,600+ files |
-| Scientific Computations | 442 with full audit trails |
+| Total Code | 1,099,000+ lines across 8,078 files (1,055K Python + 17K TypeScript + 26K LaTeX + C++) |
+| Computation Runs | 974 individual timestamped runs across 421 directories |
+| Processed Data | 1.9 million lines across 3,917 data files |
 | Integrated Data | 170 GB across 80+ observational and simulation datasets |
 | Galaxies Analyzed | 4,142 cross-matched across 16 surveys |
 | Papers Authored | 3 (1 in revision, 2 in preparation) |
@@ -21,7 +22,8 @@ Full project access available upon request — contact Dig.Russell.Licht@Gmail.c
 | Repositories | 9 active (2 public, 7 private) |
 | Audit Reports | 12 comprehensive audits, 213 audit files |
 | Domains | Astrophysics, gravitational physics, quantitative finance, aerospace, developer tooling |
-| Build Period | 90 days |
+| Status | **Actively ongoing** — all projects growing daily |
+| Build Period | Started January 2026 (90 days and counting) |
 
 ---
 
