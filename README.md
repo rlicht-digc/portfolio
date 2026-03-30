@@ -81,13 +81,59 @@ shared_constants.py (single source of truth — read-only across all repos)
 
 ---
 
-### 2. V3 Autonomous Investment System
+### 2. V3 — LLM-Orchestrated Self-Generating Agent Platform
 
 **Scale**: 49 microservices, 567K lines of Python, 535+ unit tests
+**Key Feature**: Agents create agents — the system scales by writing specs, not code.
 
-**Architecture**:
+**Self-Generating Agent Pipeline (Oracle + Genesis)**:
 ```
-Layer 1: Data Scouts (15 agents)
+Markdown Specification (human writes what the agent should do)
+    ↓
+Oracle (Claude API — claude-sonnet-4)
+    ├── Reads spec + TDD-first system prompt
+    ├── Generates production-ready code (files with path delimiters)
+    ├── Parses response into individual files (path traversal prevention)
+    └── Writes to output directory
+    ↓
+Genesis Pipeline (automated end-to-end)
+    ├── Submit Argo Workflow (3-stage: write-spec → invoke-oracle → export)
+    ├── Extract generated files
+    ├── Run pytest locally on generated tests
+    ├── Create git branch (genesis/<agent-name>)
+    ├── Commit with Argo workflow reference
+    └── Create GitHub PR with file manifest
+    ↓
+Kubernetes Deployment (auto-generated manifests)
+```
+
+**Dexter (AI Research Agent)**:
+```
+User Query
+    ↓
+Agentic Loop (max N iterations, configurable)
+    ├── Multi-LLM: Claude (w/ prompt caching), GPT, Gemini, Grok
+    ├── Provider abstraction via LangChain
+    ├── Tool Registry:
+    |   ├── financial_search — primary data tool
+    |   ├── financial_metrics — direct lookups
+    |   ├── read_filings — SEC 10-K/10-Q/8-K
+    |   ├── web_search — Exa/Tavily
+    |   ├── browser — Playwright web scraping
+    |   └── skill — invokes SKILL.md workflows (e.g. DCF valuation)
+    ├── Scratchpad (JSONL context store):
+    |   ├── Tool calls, results, thinking steps
+    |   ├── Token threshold-based clearing (oldest first)
+    |   └── Keeps N most recent tool results
+    ├── Event Stream: tool_start, tool_end, thinking, answer_start, done...
+    └── Skill deduplication (each skill runs once per query)
+    ↓
+Structured Output (Zod schema validation)
+```
+
+**Data & Synthesis Pipeline**:
+```
+Layer 1: Data Scouts (15 agents, self-generated via Oracle)
     ├── Equities: Alpaca (real-time quotes + trades)
     ├── Crypto: Coinbase WebSocket (L2 order book)
     ├── Market Data: Polygon, Alpha Vantage
@@ -100,43 +146,36 @@ Layer 1: Data Scouts (15 agents)
 Layer 2: Feature Engines (11 engines)
     ├── Macro: Liquidity, USD strength, commodities, industrial cycle
     ├── Microstructure: Dealer gamma, dark pool activity
-    └── Crypto/DeFi: Dominance, mempool, stablecoin flow, liquidations, DEX liquidity
+    └── Crypto/DeFi: Dominance, mempool, stablecoin flow, liquidations, DEX
 
-Layer 3: Synthesis
-    ├── Kalman Filter fusion
-    ├── Hidden Markov Models
-    ├── Bayesian networks
-    └── Conviction scoring → 6 strategy modules
+Layer 3: LLM-Routed Synthesis
+    ├── HMM regime detection (3-state Gaussian, Baum-Welch EM, Viterbi)
+    ├── Kalman signal fusion (staleness detection, quorum checking)
+    ├── Bayesian belief propagation (multi-factor evidence integration)
+    ├── Conviction scoring: evidence (40%) + breadth (35%) + robustness (25%)
+    └── Thesis generation → Kafka: synthesis.thesis.v1
 
 Layer 4: Execution
-    ├── Position sizing
-    ├── Risk management
+    ├── Position sizing + risk management
     └── Order routing (Alpaca Markets API)
 
-Layer 5: CIO Command Center
-    └── Flask + PostgreSQL human oversight dashboard
+Layer 5: CIO Command Center (human-in-the-loop)
+    ├── Flask + PostgreSQL dashboard
+    ├── Dead-letter queue for failed/invalid events
+    ├── Subscription management + override capability
+    └── Token-based authentication
+```
 
-Infrastructure:
-    ├── Kafka/Redpanda (42+ topics, multi-agent event streaming)
+**Infrastructure**:
+```
+Kubernetes on GKE
+    ├── Hardened containers (runAsNonRoot, read-only FS, dropped capabilities)
+    ├── Secrets management (oracle-api-credentials, never in code)
+    ├── Argo Workflows (agent generation + job scheduling)
+    ├── Kafka/Redpanda (42+ topics, event-driven loose coupling)
     ├── PostgreSQL 16 (persistent storage)
-    ├── Kubernetes on GKE (container orchestration)
-    ├── Argo Workflows (job scheduling)
     ├── Prometheus + Grafana (monitoring)
-    ├── GitHub Actions (CI/CD)
-    └── Docker (containerization)
-```
-
-**Backtest Engine**:
-```
-Docker Image (GCP Artifact Registry)
-    → K8s Job (argo namespace)
-    → Two-Pass Architecture:
-        Pass 1: Daily bars (spot + optional perps)
-        Pass 2: 4H bars (intraday perps)
-    → Reflexive Strategy Router:
-        5 strategies × per-strategy exit profiles
-        50-trade rolling feedback loop (λ=0.95)
-    → PostgreSQL results
+    └── GitHub Actions (CI/CD)
 ```
 
 ---
